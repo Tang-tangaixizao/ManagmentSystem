@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后台权限管理系统</title>
+  <link rel="stylesheet" href="./static/bootstrap.min.css">
+  <script src="./static/jquery.min.js"></script>
+  <script src="./static/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="./static/fourm/modules/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/fourm/modules/ionicons/css/ionicons.min.css">
+  <link rel="stylesheet" href="./static/fourm/modules/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
+  <link rel="stylesheet" href="./static/fourm/modules/summernote/summernote-lite.css">
+  <link rel="stylesheet" href="./static/fourm/modules/flag-icon-css/css/flag-icon.min.css">
+  <link rel="stylesheet" href="./static/fourm/css/style.css">
+  <link rel="stylesheet" href="./static/fourm/css/demo1.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class="main-wrapper">
+      <div class="navbar-bg"></div>
+      <nav class="navbar navbar-expand-lg main-navbar" id="nav_box">
+        <form class="form-inline mr-auto">
+          <ul class="navbar-nav mr-3" onclick="navbar_display();">
+            <!--<li><a href="javascript:;" data-toggle="sidebar" class="nav-link nav-link-lg"><i
+                  class="ion ion-navicon-round"></i></a></li>
+            <li><a href="javascript:;" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i
+                  class="ion ion-search"></i></a></li>-->
+          </ul>
+          <div class="search-element">
+            <input class="form-control" type="text" placeholder="请输入搜索的账号"/>
+            <input type="text" style="display: none;"/>
+            <button type="button" class="btn search_btn"><i class="ion ion-search"></i></button>
+          </div>
+        </form>
+
+        <div class="btn-group">
+          <button type="button" name="dropdown_btn" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">用户
+          </button>
+          <ul class="dropdown-menu" name="select_menu" role="menu">
+            <li><a href="#">用户</a></li>
+            <li><a href="#">角色</a></li>
+            <li><a href="#">日志</a></li>
+            <li><a href="#">登录信息</a></li>
+          </ul>
+        </div>
+
+        <ul class="navbar-nav navbar-right">
+          <li class="dropdown dropdown-list-toggle">
+           <!-- <a href="#" data-toggle="dropdown"
+              class="nav-link notification-toggle nav-link-lg beep">
+            <i class="ion ion-ios-bell-outline"></i></a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right">
+            </div>-->
+          </li>
+          <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg">
+              <i class="ion ion-android-person d-lg-none"></i>
+              <div class="d-sm-none d-lg-inline-block"></div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <a  name="adminInfo" class="dropdown-item has-icon">
+                <i class="ion ion-android-person"></i>管理员信息
+              </a>
+              <a  name="changePassword" class="dropdown-item has-icon">
+                <i class="ion ion-android-person"></i>修改密码
+              </a>
+              <a href="" onclick="logout();" class="dropdown-item has-icon">
+                <i class="ion ion-log-out"></i> 退出
+              </a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+      <div class="main-sidebar" id="main_sidebar_box" style="overflow: auto;">
+        <aside id="sidebar-wrapper">
+          <div class="sidebar-brand">
+            <a href="#">Stisla Lite</a>
+          </div>
+          <div class="sidebar-user">
+            <div class="sidebar-user-picture">
+              <img alt="image" src="./img/usericon.svg">
+            </div>
+            <div class="sidebar-user-details">
+              <div class="user-name"></div>
+              <div class="user-role">
+                管理员
+              </div>
+            </div>
+          </div>
+          <ul class="sidebar-menu">
+            <li class="menu-header">管理台</li>
+            <li>
+            <li>
+              <a name="submenu_system_basics" href="#" class="has-dropdown"><i class="ion ion-speedometer"></i><span>系统基础管理</span></a>
+            </li>
+            <ul class="menu-down submenu_system_basics">
+              <li name="userManagement"><a href="#"><i class="ion ion-ios-circle-outline"></i> 用户管理</a></li>
+              <li name="roloManagement"><a href="#"><i class="ion ion-ios-circle-outline"></i>角色管理</a></li>
+              <li name="menuManagement"><a href="#"><i class="ion ion-ios-circle-outline"></i> 菜单管理</a></li>
+            </ul>
+            </li>
+
+            <li>
+              <a name="submenu_system_moniry" href="#" class="has-dropdown"><i class="ion ion-ios-albums-outline"></i><span>系统监控管理</span></a>
+              <ul class="menu-down submenu_system_moniry">
+                <li name="warningList"><a href="#"><i class="ion ion-ios-circle-outline"></i> 警告列表</a></li>
+                <li name="monitorList"><a href="#"><i class="ion ion-ios-circle-outline"></i>实时监控</a></li>
+              </ul>
+            </li>
+
+            <li>
+              <a name="submenu_system" href="#" class="has-dropdown"><i class="ion ion-clipboard"></i><span>系统操作管理</span></a>
+              <ul class="menu-down submenu_system">
+                <li name="userLoginInfo"><a href="#"><i class="ion ion-ios-circle-outline"></i> 登录信息管理</a></li>
+                <li name="logQuery"><a href="#"><i class="ion ion-ios-circle-outline"></i> 操作日志管理</a></li>
+              </ul>
+            </li>
+
+            <div class="p-3 mt-4 mb-4">
+              <!--<a href="#" class="btn btn-danger btn-shadow btn-round has-icon has-icon-nofloat btn-block">
+                <i class="ion ion-help-buoy"></i>
+                <div>Go PRO!</div>
+              </a>-->
+            </div>
+          </ul>
+        </aside>
+      </div>
+      <div class="main-content" id="main_context_box">
+        <section class="section">
+          <div class="col-lg-12 col-md-12 col-12 col-sm-12">
+            <div class="col-lg-12 col-md-12 col-12 col-sm-12">
+              <div class="card">
+                <div class="card-body" style="height: 660px;">
+
+                  <iframe id="mainIframe" style="width:100%;border: none;height: 100%; "
+                    src=""></iframe>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  
+  <script src="./static/fourm/modules/jquery.min.js"></script>
+  <script src="./static/fourm/modules/popper.js"></script>
+  <script src="./static/fourm/modules/tooltip.js"></script>
+  <script src="./static/fourm/modules/bootstrap/js/bootstrap.min.js"></script>
+  <script src="./static/fourm/modules/nicescroll/jquery.nicescroll.min.js"></script>
+  <script src="./static/fourm/modules/scroll-up-bar/dist/scroll-up-bar.min.js"></script>
+  <script src="./static/fourm/js/sa-functions.js"></script>
+  <script src="./static/fourm/modules/summernote/summernote-lite.js"></script>
+  <script src="./static/fourm/js/demo1.js"></script>
+  <script src="./static/fourm/js/custom.js"></script>
+
+  <script>
+    function getQueryVariable(variable) {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        if(pair[0] == variable){return pair[1];}
+      }
+      return(false);
+    }
+
+    $(function () {
+      $('.menu-down').find("li").each(function () {
+        $(this).click(function () {
+          let pagename=$(this).attr("name")=="warningList"?
+                  $(this).attr("name"):"ordinary"+$(this).attr("name");
+          $.post("/MS/getuserinfobyid", {
+                    id: getQueryVariable("data"),
+                  },
+                  function (data) {
+                    if(data!=""){
+                      $(".user-role").text(data.username.replace(/^\s+|\s+$/g, ""));
+                      console.log(data.faceicon);
+                      $(".sidebar-user-picture > img").attr("src", data.faceicon);
+                      if(data.rolo=="普通用户"){
+                        $("#mainIframe").attr("src", "./templates/"
+                                +pagename + ".html");
+                      }else{
+                        $("#mainIframe").attr("src", "./templates/"
+                                +pagename.replace("ordinary","") + ".html");
+                      }
+                    }else{
+                      /**为空则证明用户非法登录
+                       * 跳转到登录页面
+                       * */
+                      window.location.href="index.html";
+                    }
+                  });
+        })
+      });
+
+      $("[name='adminInfo']").click(function () {
+        $("#mainIframe").attr("src", "./templates/" + $(this).attr("name") + ".html");
+      });
+      $("[name='changePassword']").click(function () {
+        $("#mainIframe").attr("src", "./templates/" + $(this).attr("name") + ".html");
+      });
+
+      /**折叠与展开
+       * */
+      $(".has-dropdown").click(function(){
+        $("."+$(this).attr("name")).toggle();
+      });
+
+      /**展示管理员名称和图片
+       * */
+     $(document).ready(function(){
+       $.post("/MS/getuserinfobyid", {
+                 id: getQueryVariable("data"),
+               },
+               function (data) {
+                  if(data!=""){
+                    $(".user-role").text(data.username.replace(/^\s+|\s+$/g, ""));
+                    $(".sidebar-user-picture > img").attr("src", data.faceicon);
+                    if(data.rolo=="普通用户"||data.rolo=="管理员"){
+                      $("[name=monitorList]").hide();
+                    }
+                  }else{
+                    /**为空则证明用户非法登录
+                     * 跳转到登录页面
+                     * */
+                    window.location.href="index.html";
+                  }
+               });
+     });
+
+      /**查询方式
+       * */
+      $("[name=select_menu] li").click(function(){
+        $(".form-control").val("");
+        $("[name=dropdown_btn]").text($(this).text());
+        switch ($(this).text()) {
+          case "用户":
+            $(".form-control").attr("placeholder","请输入搜索的账号");
+            break;
+          case "角色":
+            $(".form-control").attr("placeholder","请输入搜索的角色");
+            break;
+          case "日志":
+            $(".form-control").attr("placeholder","请输入搜索账号的日志信息");
+            break;
+          case "登录信息":
+            $(".form-control").attr("placeholder","请输入搜索账号的登录信息");
+            break;
+          default:
+            $(".form-control").attr("placeholder","请输入搜索内容");
+        }
+      });
+
+      /**搜索功能
+       * */
+      $(".search_btn").click(function(){
+        $("#mainIframe").attr("src", "./templates/resultInfo.html");
+        setTimeout(function(){
+          let html=[];
+          switch ($("[name=dropdown_btn]").text()) {
+            case "用户":
+              $.ajax({
+                url:"/MS/selectuserinfo",
+                data:{username:$(".form-control").val()},
+                success:function(response){
+                  html.push("<thead>");
+                  html.push("<tr>");
+                  html.push("<th>ID</th>");
+                  html.push("<th>账号</th>");
+                  html.push("<th>角色</th>");
+                  html.push("</tr>");
+                  html.push("</thead>");
+                  html.push("<tbody>");
+                  let i=0;
+                  while(i<response.length){
+                    html.push("<tr>");
+                    html.push("<td>"+response[i].id+"</td>");
+                    html.push("<td>"+response[i].username+"</td>");
+                    html.push("<td>"+response[i].rolo+"</td>");
+                    html.push("</tr>");
+                    i++;
+                  }
+                  html.push("</tbody>");
+                  $("#mainIframe").contents().find("#result_table").html(html);
+                  html.length=0;
+                }
+              })
+              ;break;
+            case "角色":
+              $.ajax({
+                url:"/MS/selectroloinfo",
+                data:{rolo:$(".form-control").val()},
+                success:function(response){
+                  html.push("<thead>");
+                  html.push("<tr>");
+                  html.push("<th>ID</th>");
+                  html.push("<th>角色</th>");
+                  html.push("<th>权限</th>");
+                  html.push("</tr>");
+                  html.push("</thead>");
+                  html.push("<tbody>");
+                  let i=0;
+                  while(i<response.length){
+                    html.push("<tr>");
+                    html.push("<td>"+response[i].id+"</td>");
+                    html.push("<td>"+response[i].rolo+"</td>");
+                    html.push("<td>"+response[i].power+"</td>");
+                    html.push("</tr>");
+                    i++;
+                  }
+                  html.push("</tbody>");
+                  $("#mainIframe").contents().find("#result_table").html(html);
+                  html.length=0;
+                }
+              })
+              ;break;
+            case "日志":
+              $.ajax({
+                url:"/MS/selectlog",
+                data:{username:$(".form-control").val()},
+                success:function(response){
+                  html.push("<thead>");
+                  html.push("<tr>");
+                  html.push("<th>账号</th>");
+                  html.push("<th>身份</th>");
+                  html.push("<th>操作时间</th>");
+                  html.push("<th>操作结果</th>");
+                  html.push("<th>事件</th>");
+                  html.push("</tr>");
+                  html.push("</thead>");
+                  html.push("<tbody>");
+                  let i=0;
+                  while(i<response.length){
+                    html.push("<tr>");
+                    html.push("<td>"+response[i].username+"</td>");
+                    html.push("<td>"+response[i].rolo+"</td>");
+                    html.push("<td>"+response[i].time+"</td>");
+                    html.push("<td>"+response[i].result+"</td>");
+                    html.push("<td>"+response[i].event+"</td>");
+                    html.push("</tr>");
+                    i++;
+                  }
+                  html.push("</tbody>");
+                  $("#mainIframe").contents().find("#result_table").html(html);
+                  html.length=0;
+                }
+              })
+              ;break;
+            case "登录信息":
+              $.ajax({
+                url:"/MS/selectlogin",
+                data:{username:$(".form-control").val()},
+                success:function(response){
+                  html.push("<thead>");
+                  html.push("<tr>");
+                  html.push("<th>账号</th>");
+                  html.push("<th>登入时间</th>");
+                  html.push("<th>登入IP</th>");
+                  html.push("</tr>");
+                  html.push("</thead>");
+                  html.push("<tbody>");
+                  let i=0;
+                  while(i<response.length){
+                    html.push("<tr>");
+                    html.push("<td>"+response[i].username+"</td>");
+                    html.push("<td>"+response[i].logintime+"</td>");
+                    html.push("<td>"+response[i].loginIP+"</td>");
+                    html.push("</tr>");
+                    i++;
+                  }
+                  html.push("</tbody>");
+                  $("#mainIframe").contents().find("#result_table").html(html);
+                  html.length=0;
+                }
+              })
+              ;break;
+            default:
+              $.ajax({
+                url:"/MS/selectuserinfo",
+                data:{username:$(".form-control").val()},
+                success:function(response){
+                  html.push("<thead>");
+                  html.push("<tr>");
+                  html.push("<th>ID</th>");
+                  html.push("<th>账号</th>");
+                  html.push("<th>角色</th>");
+                  html.push("</tr>");
+                  html.push("</thead>");
+                  html.push("<tbody>");
+                  let i=0;
+                  while(i<response.length){
+                    html.push("<tr>");
+                    html.push("<td>"+response[i].id+"</td>");
+                    html.push("<td>"+response[i].username+"</td>");
+                    html.push("<td>"+response[i].rolo+"</td>");
+                    html.push("</tr>");
+                    i++;
+                  }
+                  html.push("</tbody>");
+                  $("#mainIframe").contents().find("#result_table").html(html);
+                  html.length=0;
+                }
+              });
+          }
+        },30);
+      });
+
+    });
+
+    function logout(){
+      window.location.reload();
+      $.ajax({
+        url:"/MS/signout"
+      })
+    }
+  </script>
+</body>
+
+</html>

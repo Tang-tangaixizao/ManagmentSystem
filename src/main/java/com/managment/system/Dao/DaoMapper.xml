@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.managment.system.Dao.DaoMapper">
+    <!--初始化表格信息-->
+    <select id="getLoginUserInfo" resultType="com.managment.system.Entity.UserInfo"
+            parameterType="java.lang.String">
+        select * from user where username=#{username} and password=#{password}
+    </select>
+    <select id="getUserInfoById" resultType="com.managment.system.Entity.UserInfo"
+            parameterType="java.lang.Integer">
+        select * from user where id=#{id}
+    </select>
+    <select id="getRoloInfo" resultType="com.managment.system.Entity.RoloInfo">
+        select * from rolo
+    </select>
+    <select id="getUserinfo" resultType="com.managment.system.Entity.UserManagementInfo">
+        select id,username,rolo from user limit #{page},#{limit}
+    </select>
+    <select id="getWarningList" resultType="com.managment.system.Entity.WarningInfo">
+        select * from warninginfo
+    </select>
+    <select id="getLoginInfoList" resultType="com.managment.system.Entity.LoginInfo">
+        select * from logininfo limit #{page},#{limit}
+    </select>
+    <select id="getLogInfo" resultType="com.managment.system.Entity.LogInfo">
+        select * from log limit #{page},#{limit}
+    </select>
+    <select id="getMenuInfo" resultType="com.managment.system.Entity.MenuInfo">
+        select * from menuinfo
+    </select>
+
+    <!--CPU利用率超过90%录入数据库-->
+    <insert id="Warning" parameterType="java.lang.String">
+        insert into warninginfo(time,type,explain) values
+        (#{time},#{type},#{explain})
+    </insert>
+    
+    <!--用户登录信息记录-->
+    <insert id="userLoginLog" parameterType="java.lang.String">
+        insert into logininfo(username,logintime,loginIP)
+        values(#{username},#{logintime},#{loginIP})
+    </insert>
+
+    <!--用户查询-->
+    <select id="selectUserInfo" parameterType="java.lang.String" resultType="com.managment.system.Entity.UserManagementInfo">
+        select id,username,rolo from user where username like #{username}
+    </select>
+    
+    <!--角色查询-->
+    <select id="selectRoloInfo" resultType="com.managment.system.Entity.RoloInfo" parameterType="java.lang.String">
+        select *from rolo where rolo like #{rolo}
+    </select>
+
+    <!--日志查询-->
+    <select id="selectLog" resultType="com.managment.system.Entity.LogInfo" parameterType="java.lang.String">
+        select *from log where username like #{username}
+    </select>
+
+    <!--登录信息查询-->
+    <select id="selectLoginInfo" resultType="com.managment.system.Entity.LoginInfo" parameterType="java.lang.String">
+        select *from logininfo where username like #{username}
+    </select>
+    
+    <!--添加用户信息-->
+    <insert id="addUserInfo" parameterType="java.lang.String" >
+        insert into user(faceicon,username,name,iphone,age,sex,rolo,password)
+        values ( #{faceicon}, #{username}, #{name}, #{iphone}, #{age}, #{sex}, #{rolo}, #{password});
+    </insert>
+
+    <!--更新用户信息-->
+    <update id="updateUserInfo" parameterType="java.lang.String">
+        update user set username=#{username},rolo=#{rolo} where id=#{id}
+    </update>
+
+    <!--删除指定用户-->
+    <delete id="delUserInfoById" parameterType="java.lang.Integer">
+        delete from user where id=#{id}
+    </delete>
+
+    <!--批量删除指定用户-->
+    <delete id="delUserInfoByIds" >
+        delete from user where id in
+        <foreach collection="array" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--添加角色信息-->
+    <insert id="addRoloInfo" parameterType="java.lang.String" >
+        insert into rolo(rolo,power)
+        values ( #{rolo}, #{power});
+    </insert>
+
+    <!--更新角色信息-->
+    <update id="updateRoloInfo" parameterType="java.lang.String">
+        update rolo set rolo=#{rolo},power=#{power} where id=#{id}
+    </update>
+
+    <!--删除指定角色-->
+    <delete id="delRoloInfoById" parameterType="java.lang.Integer">
+        delete from rolo where id=#{id}
+    </delete>
+
+    <!--批量删除指定角色-->
+    <delete id="delRoloInfoByIds" parameterType="java.lang.Integer">
+        delete from rolo where id in
+        <foreach collection="array" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--更新菜单信息-->
+    <update id="menuEdit" parameterType="java.lang.String">
+        update menuinfo set authorityName=#{menuName}
+        ,menuUrl=#{menuUrl}
+        ,authority=#{power}
+        ,isMenu=#{type}
+        ,createTime=#{time}
+        ,isHide=#{isHide} where authorityId=#{id}
+    </update>
+
+    <!--删除指定的菜单-->
+    <delete id="delMenuById" parameterType="java.lang.Integer">
+        delete from menuinfo where authorityId=#{id}
+    </delete>
+    
+    <!--添加登录信息-->
+    <insert id="addLoginInfo" parameterType="java.lang.String">
+        insert into logininfo(username,logintime,loginIP) values(#{username},#{logintime},#{loginIP})
+    </insert>
+
+    <!--编辑登录信息-->
+    <update id="editLoginInfo" parameterType="java.lang.String">
+        update logininfo set username=#{username},logintime=#{logintime},loginIP=#{loginIP}
+        where id=#{id}
+    </update>
+
+    <!--删除指定的登录信息-->
+    <delete id="delLoginInfo" parameterType="java.lang.Integer">
+        delete from logininfo where id=#{id}
+    </delete>
+
+    <!--批量删除登录信息-->
+    <delete id="delLoginInfoByIds" parameterType="java.lang.Integer">
+        delete from logininfo where id in
+        <foreach collection="array" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--删除指定日志-->
+    <delete id="delLogById" parameterType="java.lang.Integer">
+        delete from log where id=#{id}
+    </delete>
+
+    <!--批量删除指定日志-->
+    <delete id="delLogByIds" parameterType="java.lang.Integer">
+        delete from log where id in
+        <foreach collection="array" open="(" close=")" item="id" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--日志信息录入-->
+    <insert id="observationLog" parameterType="java.lang.String">
+        insert into log(username,rolo,time,result,event)
+        values(#{username},#{rolo},#{time},#{result},#{event})
+    </insert>
+
+    <!--按id查询角色信息-->
+    <select id="getRoloById" parameterType="java.lang.Integer" resultType="com.managment.system.Entity.RoloInfo">
+        select *from rolo where id=#{id}
+    </select>
+
+    <!--按Id查询日志-->
+    <select id="getLogInfoById" parameterType="java.lang.Integer" resultType="com.managment.system.Entity.LogInfo">
+        select * from log where id=#{id}
+    </select>
+
+    <!--按Id查询菜单信息-->
+    <select id="getMenuInfoById" parameterType="java.lang.Integer" resultType="com.managment.system.Entity.MenuInfo">
+        select * from menuinfo where authorityId=#{id}
+    </select>
+
+    <!--更新个人信息-->
+    <update id="changeMyInfo" parameterType="java.lang.String">
+        update user set faceicon=#{faceicon},username=#{username},
+        name=#{name},iphone=#{iphone},age=#{age},sex=#{sex}
+        ,rolo=#{rolo} where id=#{id}
+    </update>
+
+    <!--修改密码-->
+    <update id="changePassword" parameterType="java.lang.String">
+        update user set password=#{password} where id=#{id}
+    </update>
+
+    <!--查找是否存在账号-->
+    <select id="selectUserName" parameterType="java.lang.String" resultType="com.managment.system.Entity.UserInfo">
+        select *from user where username=#{username}
+    </select>
+
+    <!--查找是否存在该角色-->
+    <select id="selectRolo" parameterType="java.lang.String" resultType="com.managment.system.Entity.RoloInfo">
+        select * from rolo where rolo=#{rolo}
+    </select>
+
+    <!--查询用户条数-->
+    <select id="selectCountUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(id) from user
+    </select>
+
+    <!--查询登录信息条数-->
+    <select id="selectCountLoginInfo" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(id) from logininfo
+    </select>
+
+    <!--查询日志条数-->
+    <select id="selectCountLog" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(id) from log
+    </select>
+
+    <!--添加菜单信息-->
+    <insert id="addMenuInfo" parameterType="com.managment.system.Entity.MenuInfo">
+        insert into menuinfo values
+        (#{authorityId}, #{authorityName},
+         #{orderNumber}, #{menuUrl},
+          #{menuIcon}, #{createTime},
+           #{authority},#{checked},
+           #{updateTime}, #{isMenu},
+           #{parentId}, #{open}, #{isHide});
+    </insert>
+</mapper>

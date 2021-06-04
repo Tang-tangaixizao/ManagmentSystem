@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">  
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>系统基础管理</li>
+        <li class="active">用户管理</li>
+      </ul>
+        <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+            <button id="userdelcond" type="button" class="btn btn-danger" >删除选中</button>
+            <button id="useradd" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                添加用户
+            </button>
+        </div>
+          <table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate" ></table>
+
+          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            添加用户
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="name">账号</label>
+                                <input name="username" type="text" class="form-control" placeholder="输入账号">
+                                <label for="name">姓名</label>
+                                <input name="name" type="text" class="form-control" placeholder="输入姓名">
+                                <label for="name">年龄</label>
+                                <input name="age" type="text" class="form-control" placeholder="输入年龄">
+                                <label for="name">电话号码</label>
+                                <input name="iphone" autocomplete="new-password" type="text" class="form-control" placeholder="输入电话号码">
+                                <label for="name">性别</label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optionsRadiosinline" id="boy" value="男" checked>男
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optionsRadiosinline" id="girl"  value="女"> 女
+                                    </label>
+                                </div>
+                                <label for="name">角色</label>
+                                <select class="form-control selector">
+                                  <option>普通用户</option>
+                                  <option>管理员</option>
+                                  <option>超级管理员</option>
+                                </select>
+                                <label for="name">密码</label>
+                                <input name="password" autocomplete="new-password" type="password" class="form-control" placeholder="输入密码">
+                            </div>
+                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary adduserbtn">
+                            添加
+                        </button>
+                    </div>
+                </div>
+          </div>
+          </div>
+
+          <script type="text/html" id="test-table-operate-barDemo">
+            <a class="layui-btn layui-btn-xs useredit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs userdel" lay-event="del">删除</a>
+          </script>
+          <script src="../layuiadmin/layui/layui.js"></script>  
+          <script>
+        let userlistdata=[];
+        let userdelstyle;
+        let list=new Array();
+          layui.config({
+            base: '../layuiadmin/' //静态资源所在路径
+          }).extend({
+            index: '/lib/index' //主入口模块
+          }).use(['index', 'table'], function(){
+            var table = layui.table
+            ,admin = layui.admin;
+          
+            table.render({
+              elem: '#test-table-operate'
+              ,url:"/MS/getuserinfo"
+              ,cols: [[
+                {type:'checkbox', fixed: 'left'}
+                ,{field:'id', width:250, title: 'ID', sort: true, fixed: 'left'}
+                ,{field:'username', width:250, title: '账号'}
+                ,{field:'rolo', width:300, title: '角色', sort: true}
+                ,{width:280, align:'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+              ]]
+              ,page: true
+            });
+            
+            //监听表格复选框选择
+            table.on('checkbox(test-table-operate)', function(obj){
+                userdelstyle=obj.type;
+                userlistdata.push(obj.data.id);
+            });
+
+            //监听工具条
+            table.on('tool(test-table-operate)', function(obj){
+              let data = obj.data;
+              if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                  obj.del();
+                  layer.close(index);
+                  $.ajax({
+                      url:"/MS/deluserinfobyid",
+                      data:{id:data.id},
+                      success:function(response){
+                          if(response!=0){
+                              layer.msg("删除成功");
+                          }else{
+                              layer.msg("删除失败，请重新尝试");
+                          }
+                      }
+                  });
+                });
+              } else if(obj.event === 'edit'){
+                layer.alert("<label>ID</label>" +
+                    "<input id='id' type='text' class='form-control' value='"+data.id+"' />"+
+                    "<label>账号</label>" +
+                    "<input id='username' type='text' class='form-control' value='"+data.username+"' />"+
+                    "<label>角色</label>" +
+                    "<input id='rolo' type='text' class='form-control' value='"+data.rolo+"' />",{
+                    btn: ['确定','取消'],
+                    yes:function(){
+                        $.ajax({
+                            url:"/MS/edituserinfo",
+                            data:{
+                            id:$("#id").val(),
+                            username:$("#username").val(),
+                            rolo:$("#rolo").val()
+                            },
+                          success:function(response){
+                                if(response!=0){
+                                    layer.msg("更新用户信息成功");
+                                }else{
+                                    layer.msg("更新用户信息失败请重新尝试");
+                                }
+                                setTimeout(function(){
+                                    window.location.reload();
+                                },1000);
+                          }
+                        });
+                    }
+                });
+              }
+            });
+            
+            $('.test-table-operate-btn .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+            });
+
+            $("#userdelcond").click(function(){
+                if(userdelstyle=="all"){
+                    layer.alert('无权限清空数据表', {
+                        icon: 5,
+                        title: "错误"
+                    });
+                }else if(userlistdata!=""){
+                    $.ajax({
+                        url:"/MS/deluserinfobyids",
+                        data:{id:userlistdata},
+                        traditional: true,//传递数组这里设置为true
+                        success:function(respose){
+                            if(respose!=0){
+                                layer.msg("删除成功");
+                            }else{
+                                layer.msg("删除失败请重新尝试");
+                            }
+                            setTimeout(function(){
+                                location.reload();
+                            },1000);
+                        }
+                    });
+                }else{
+                    layer.alert('请选择需要删除的数据', {
+                        icon: 5,
+                        title: "错误"
+                    });
+                }
+            });
+
+            $(".adduserbtn").click(function(){
+                if($("input[name=password]").val()==""){
+                    layer.msg("密码不能为空!!!");
+                }else{
+                    $.ajax({
+                        url:"/MS/adduserinfo",
+                        data:{
+                            faceicon:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAUNUlEQVR4Xu2dCZAc5XXH/69ndyVFyA7ChYlASNOz4pC0M0gcQlAm3KdJOAyxEXJMwAemIIRYoOmVYB1pehB2MIgYY+NYxkHhsIW5SjLEKYhtLEQipOnRBbszo4MyDsYqgoQQuzv9UrMSBQYdMz3d0/19/aZqC6r0vff+7/e+f3XvbB8E+QgBIbBXAiRshIAQ2DsBMYjsDiGwDwJiENkeQkAMIntACHgjIEcQb9wkKiYExCAxGbS06Y2AGMQbN4mKCQExSMCDTn+r72AMGEcCOIKA8Qw6AOBRDIwi5lEg6iDQNgZvA3g7AduY6E0QNhgDvGH13FRvwBIlvfyS3po9MLFnbUd7+8iTXaqeTaDTa6YA8OdNVq8CWA9gBROeIaNjuXPLYa81mVPC6yQgR5A6Qe1t2cSeyiGJdr6UgNNAOBPAJ5tMWUc4LSd2XwQSTxW6xz9XR4As8UhADOIRXCZXOYeJLwVQ+xntMY0PYfwCM5ZUE1iybnZqsw8JJcWHCIhBGtgOXflNBxK7MxnulQQ6voHQVizdDsbDLruL1szp/G0rCsahhhikjilPnvfq0Uai7UoAMwGMrSMk5CX8MBEtKmTNZ0MWonx5Mcg+RjjxjsohiUG2CPgqgA7lpk14Akx5x0quUE57RASLQfYyiIxducqFaxGoMyKz8iqjH8z5wYGd9rqeSf1ek8Q1TgzykclP+qdypq0N3QxcptmmWMEu5Ytzkk9o1leg7YhBPoS3K1/5EoEXgHFwoNTDTf7tkcPbb11+09h3w5WhRnUxCIDpd24ZsX3nwAICrldjbE2qZLzIBs8tZlO/bDKT9uGxN0hXvu9YYroboJO1n/ZHG2T+ptOd6old3w00HGuDTJ7Xe6rR1rYYzGMaYKbVUgbuLFrmP2rVlI/NxNYgQ+ZIJOQyjdpmYr7P6U5d6+O+0iZVLA0i5tjD/mXknG5zjjY726dGYmeQKfPL46oGNvrET6s0RHx1IZv6kVZNNdlMrAxylL3+oA7u2ACiTzXJTdtwJlxezJo/1bbBBhuLjUGG7tUYNuIxZlzQIKPYLReTfDDy2BgkY5cfZGBG7Ha7x4aZEmcVs+Ni/3eSWBgknSv1gOg2j3slpmH0cj92nr3BOvqPMQUw1Lb2BunKl2YQ04NxHrLn3gk/dLLmlz3HaxCotUHSdmUamJeCwrzjT/FdQnydk03dq3gXnuXrbpBlAJ/rmY4EAoytCUp8ZpU1bl0ccWhrkKErc5kXxXGofvdMwOKCZdbuqIzdR0uD1K7O3bFzYDkDmdhNNKCGmfjKYja1OKD0kU2rpUHS+UoWzHZkqasojGhtdVjbKWtvGrtVRfleNWtnkIm3lw5vY1oBxiFeoUjcngkQGfMK2fG3xomPdgbJ5Cu3M/MtcRpiC3vdWiV32tpsZ18La4ZaSiuDTF6w8Wij6r4E4IBQqWpcnIi+U8gmb9K4xT9pTSuDZOzyvzBwXVyGF1Kf/QkDJ6yabRZCqt/SstoYZGp+S+cgD8iT0FuwfRi4p2iZN7SgVOgltDFIJle+ngkLQycaAwEM7itaqQkxaFWfa7HS+cpSMJ8Xh6FFoUdm9/xid+eyKGgJUoMWRxA5vQpyi+w5d1xOs7QwiJxehWGQeJxmaWGQrlzlMSK+uPXbJN4V2cBfFmebv9KZghYGSduVNwE+SOdBRbE3BuYWLXN+FLX5pUl5g8gjfPzaCl7y8C8dK3WWl0hVYpQ3iNxOG+pW63csc1ioCgIurrxBuuzycwScGjAnSb8XAm61etqauROe1xWQ8gZJ58uvy5W74W1PIrq2kE3eF56CYCsrbZBdL9Wsxur+hGC3g4fsRHc72eSNHiKVCFHbIPbG6QRX3uga4lZj4NmiZZ4TooRASyttkNp7BBksz5INdIvsN/lmxzLH7XeVogsUN0h5HgPyRPKQN9+Rncm2n15O1ZBlBFJeaYOk7cp3ANb2/DeQiQeQ1OinA1f3JN8KIHXoKRU3SPmHAK4OnWLMBbiue/iaOZ1bdMSgtEG67PIjBFyu42BU6slNGBPX3DJ+vUqa69WqtEHSudJSEMk9IPVOO6B15GJaYY5ZexaAdh+1DWKXa4/nP0O7qajX0CmOZf5aPdn7V6y0QTJ25ecMvmj/bcqKIAkYTFNWdydXB1kjrNxKGyRtl38CYGZY8KTuLgJuta1zzdzDSzryUNwgpXsBktcXh70z291PO7M63whbRhD1lTZIxi4tYNDNQYCRnPUTaO/fOnJlz3E76o9QZ6XSBumyKzcTeIE6uHVUSjscKzlSx85qPSlukL6LCMbPdR2OIn2tdixziiJaG5aptEF2P4s3lm8+anjSAQUw8GjRMv8moPShp1XaIJc9yolX+iqDoVOMsQAC5hcsc66uCJQ2SG0oabvUB1BK1wFFvS8yMLMw29T2LcIaGKSyBOBLor6RdNXnMjJruk1H1/6UN0jG7vsqw9D2nugobzwCXi9Y5pgoa2xWm/IGmWJvmlhFdW2zICS+cQJE9ONCNnlV45HqRChvkKHfQ3LlDSAcqQ52bZRe41jmv2rTzR4a0cMgttw4FcYmTSAxaZU1Tuuv2bUwSFe+NIOYtP0mJYzNX0fNFY5lnljHOqWXaGGQSXduGZ14d6AXhNFKT0Ml8czfdLpTPSpJ9qJVC4PUGs/Y5QcZmOEFgsR4IUAnOlZyhZdIlWK0MYicZrV028Xi9KpGVBuDDJ1m7Rx0AD60pVsljsVicnqllUGGvu61yxaAXBz3bAt7riRQnbbKmvCHFtYMrZQ2R5AawWNvL31ygGkFWP4mEuCOmuVY5rcDzB+p1FoZZNdRpHIDwHdHirIuYgjFkcPapy2/aey7urS0vz60M8jQJfC95ZdANHV/zcu/N0aAiK8tZFOxuu5NO4Ps/sp3JgO1J57Ixy8CRMucbPJ8v9KpkkdLgwyZJF9+mhkXqDIIBXRq+3C4fbHX1iBd+U1nElf/Q4GNp4JE27HMbhWE+q1RW4MM/cKeL98PxjV+Q4tXPlo12D/ylHU9B2+PV9+7utXaILv+eDiwFMC0OA7Xj57JoHMLs5PP+JFLxRxaG2ToKGJXpoF5qVzI6GF7EllONpn3EKlNiPYGqU1KrtPytF9/5ljmZZ4iNQqKhUGGjiS5Ug+IbtNodkG28ipT4rxidlw5yCIq5I6NQXadbpUeAujzKgwmRI3b3Gr1r9bMnfB8iBoiUzpWBtllkvLLALR9VGazO8utVk8Tc3xAMXYG2W2SdwD8WbObSbd4McfHJxpLgwyZJF/eBMbhum1yz/24NN2Zk3zRc7ymgbE1SG2eGbv8LANnaTrbRtqK5WUk9QCKtUF2m+RRBmL7dSYbxvnF2eOX1bNZ4rgm9gbZ9RVw+bsgfD1WG4BQZKZbi1by8Vj13WCzYpDdwNL2xqsx9LYqPqhBhuotZ7ovQYO3xuW22WYGJAb5EL10rncqyFgA0JnNQI1wbIUYtxa69X1dgd/sxSB7IJrOV7Jg1wLoAL+Bh5WPwd+vGrDXzU5tDkuDinXFIHuZWibfOwWcyGrwC/wKdilfnJN8QsUNGrZmMch+JpCxK1eB3GuY6aSwh9VIfQZvJsaiwYGd9rqeSf2NxMraDwiIQercDZn8xotdtzqTiC6uMyScZURrCbxocFj7orU3jd0ajgh9qopBGpzl5Pl9JyUM4womXArGIQ2GB7icnyMYjwz071gkRwz/MItBPLKc1LN2tNEx4lICLgVwjsc0zYZtJqIlxMaS1da4F5pNJvEfJyAG8WFXHJMvHe+6OImIjmfCCWBM8CHtnlL8kYGVxLQShrty8L2dz6zrmRTLe8UD4vuxtGKQAEhPzpU/TQljKrnV2mvhjgDoiF3/xdg6y+0AeAOB1rvABhr6YadgpV6tM16W+URADOITyHrS1J762Ltu46jBtuootLcdkBhwR7GBYQbTtkE3sc0Y3r+t/Z23tq/sOW5HPflkTfAExCDBM5YKChMQgyg8PJEePAExSPCMpYLCBMQgCg9PpAdPQAwSPGOpoDABMYjCwxPpwRMQgwTPWCooTEAMovDwRHrwBMQgwTOWCgoTEIMoPDyRHjwBMUjwjKWCwgTEIO+/X30gMZrbBkfzII9SeJ77ld6W6BgYTPBWDLpbh23aunXlD44b2G9QjBfEwiCT8n2dBicmg7kLhMkEjAPzaBh0IBijARhx3QMEvM3AVoBrdx/+HkRr2XXXJQxa67ZtX+fMytSeYxzbj3YGmdbT+4md7W3T2eAzmHFq7f05BAyP7YSbb3wjQC8Tqs8aaP/1KmvcuuZTqpNBC4PUjhAJJGaAeTqAMwC0qTMCxZQyXgHhNwReWrBSjymmvmG5Shuk6/byKeTiSgAz5HUGDc+++QCiFxm8ODGcHlz9D8m3mk8YvQxKGuQYu+9klxKzwPzX0UMaQ0WEzcR8d8FK3alb90oZ5NieVz412NExi8E36zYITfr5hQF3/mqrU5sHSChjkK5c6QoC3QpC7T5v+USXQBXM853uVE90JdavTAmDpPPlWWDcUX9bsjJ8AvywY6W+EL6O5hRE3iDy+ubmBhxy9CrHMqeGrKGp8pE2iJijqdlGJXiHY5kjoyKmUR2RNUhXrnQ7Ed3SaEOyPpoEHMuM7F7bF7FIik7nK3eB+e+jOWpR5ZWAiiaJnEEyufL3mfAVr0OQuGgTUM0kkTJIOl9+AIwvRnvEoq5ZAiqZJDIGydjlRxi4vFn4Eq8GAVVMEgmDpHPlJ0G4UI3Rikq/CKhgktANkrHLzzJwll/QJY9aBKJuklANkrZLSwC6RK2RilpfCTB2ON3R/TtJaAbpsstzCJjnK2xJpiqB/3Es8/goig/FIMfkShe4RE9HEYhoCo3AvzmWGblvMFtukHSudyoosTK0MUjh6BIg/LOTNb8RJYEtNUh6Qe9hqCa2RAmAaIkYAUbO6TbnREVVywwysWdtR6JjxEsEZKLSvOiIJgFi3FDoNu+JgrqWGSSdKz8Akr+SR2HoKmhgds8vdncuC1trSwyStsvfAhCpc8uwwUv9fRNgcF87dZz3cnZsX5isAjdI2i7XjFEziHyEQGMEiJY52eT5jQX5uzpQg6Rz5S+C8IC/kiVbnAgwcE/RMm8Iq+fADJLO9U0GJf4L4NqjPeUjBDwTINDfFazkIs8JmggMziB26SGAPt+ENgkVArsJ8GtGFaevnpvqbTWSQAzSZZeuItCPWt2M1NOZAD3kWMkrWt2h7waZsmDzmOrgwK9AlGp1M1JPcwLE1znZ1L2t7NJ3g6Tz5e+C8fVWNiG1YkKA8CZT++nF2WOLrerYV4Nk7E2fZVSfapV4qRM/AgR+vGClLm5V574aJJ0vPwmWOwNbNbzY1mE+0+lO/Wcr+vfNIHL0aMW4pMZuAi27NN43g8jRQzZvSwlw9Vine8LLQdf0xSBy9Ah6TJJ/DwQWOpYZ+MMFfTGIHD1kA4dA4P8MomNWZ5Mbg6zdtEG6cn3nERlLgxQpuYXAHgkwfzPo95A0bxC7vJCA62WEQqDVBAgoFCzzmCDr+mCQUi+BOoMUKbmFwN4IMPiCopUK7AymKYPI6ZVs3AgQuN+xzMAedt6cQeT0KgL7I+YSmN9sHzbi6JXfGPNmECSaNIicXgUxFMnZGAEGvlK0zPsbi6pvtWeDZPLls5nxTH1lZJUQCJIALXWs5AVBVPBsELnXPIhxSE6PBP7XscxDPMbuM6wZg/wEwMwgRElOIdAogQQSk1ZZ49Y1Gre/9c0YpAAgvb8C8u9CoBUEmHlGsTv1737X8mSQ6XduGfHOzoEdfouRfELAKwEC31GwUr6/FdmTQbrs3umExG+9NiNxQiAAAs84lnmu33k9GSSTL32Nmb7ntxjJJwQ8EyD83smaf+E5fi+BngySzpV6QHSb32IknxBohkAQr3MTgzQzEYmNFAExSKTGIWKiRkAMErWJiJ5IERCDRGocIiZqBMQgUZuI6IkUATFIpMYhYqJGIDIGyeTK1zNhYdQAiZ4YE2BsdbrNg/wm4OlrXrmT0O8xSD4fCKxwLPNEH/L8SQpvBrErRxF4vd9iJJ8Q8EqAgMUFy7zSa/ze4jwZZHxPZfgnOvhdv8VIPiHgmUBAjwDyZJBaE1223G7reZgS6DsBZveqYnfnj/1O7Nkgabtce4e171dP+t2g5IsHAbdaPW3N3AnP+92td4PkK98D89f8FiT5hIAXAgZRMojHkHo2SJdd/jIBP/DSjMQIAT8JMPi/i1bqBD9zvp/Ls0FqCdJ26TcAnRyEMMkpBOonQF9yrOQD9a+vf2VzBsmXvgAm3+8Drl++rBQC/JxjpU4PikNTBtl1FCn/AsA5QQmUvEJgnwSIP+dkU0uCotS8QeaXL4SBJ4MSKHmFwF4JMJY43ebngiTUtEGGjiL5UhZMdpBCJbcQ+AiB5Y5lnhQ0FV8MsvtUq/ZHmr8NWrDkFwIANjqWmWwFCd8MIr+PtGJcUgPgfsdKDWsVCV8NMmQSeeJJq2YXuzoMPF+0zNNa2bjvBqmJnzyv91SjrW0xmMe0shmppTEBYsvJpvKt7jAQg9SayMzfcigbgwsBvqTVTUk9jQgQ3mDXvSWICxHroRSYQd4v3pXbeAXIvZGA4+sRJGuEwPsEGLgHlLirmB1XDotK4AapNXbZo5x4tbdyIxNuBHBYWM1KXWUI/MyAe9dqq/OFsBW3xCDvN3mU/dpB7bzzQoLxWRBfCFBH2ACkfkQIEIpw6WkmeqpojV8eEVVoqUE+3HTnwt5hI99puwjsfoaBowDjKIAPjQoY0REogfcI2MDABhCtrxI/vna2WXvfTOQ+oRlkTySOXPCHUcMHth3NBg4H86FExpiaaVzgUAJGofZDdACYd/2/fKJE4D0wbwMZbxN4GwNvg/EGE14n4t+xy68bhvE7F4N9xewRof1O0Siw/wdtyLEUR4+m/AAAAABJRU5ErkJggg==",
+                            username:$("input[name=username]").val(),
+                            name:$("input[name=name]").val(),
+                            iphone:$("input[name=iphone]").val(),
+                            age:$("input[name=age]").val(),
+                            sex:$("input[type='radio']:checked").val(),
+                            rolo:$(".selector").val(),
+                            password:$("input[name=password]").val()
+                        },
+                        success:function(respose){
+                            if(respose>0){
+                                layer.msg("添加用户成功");
+                            }else if(respose==-2){
+                                layer.msg("该账号以存在!!!")
+                            }else{
+                                layer.msg("添加失败请重新尝试");
+                            }
+                            setTimeout(function(){
+                                window.location.reload();
+                            },1000);
+                        }
+                    });
+                }
+            });
+          });
+
+          </script>
+</body>
+</html>

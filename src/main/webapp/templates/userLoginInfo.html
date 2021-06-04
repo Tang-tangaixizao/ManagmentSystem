@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">  
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>系统操作管理</li>
+        <li class="active">登录信息管理</li>
+      </ul>
+        <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+        </div>
+          <table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate" ></table>
+
+          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            添加登录信息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="name">账号</label>
+                                <input type="text" class="form-control" placeholder="输入账号">
+                                <label for="name">登入时间</label>
+                                <input type="text" class="form-control" placeholder="输入登入时间">
+                                <label for="name">登入IP</label>
+                                <input type="text" class="form-control" placeholder="输入登入IP">
+                            </div>
+                         </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            添加
+                        </button>
+                    </div>
+                </div>
+          </div>
+          </div>
+
+          <script src="../layuiadmin/layui/layui.js"></script>
+          <script>
+        let list=new Array();
+          layui.config({
+            base: '../layuiadmin/' //静态资源所在路径
+          }).extend({
+            index: '/lib/index' //主入口模块
+          }).use(['index', 'table'], function(){
+            var table = layui.table
+            ,admin = layui.admin;
+          
+            table.render({
+              elem: '#test-table-operate'
+              ,url: "/MS/getlogininfolist"
+                ,page:{				//分页设置
+                    limit:10,		//默认每一页显示数量
+                    limits:[5,10,20,30,40,50]
+                }
+              ,cols: [[
+                {type:'checkbox', fixed: 'left'}
+                ,{field:'username', width:350, title: '账号', sort: true, fixed: 'left'}
+                ,{field:'logintime', width:350, title: '登入时间'}
+                ,{field:'loginIP', width:380, title: '登入IP', sort: true}
+              ]]
+              ,page: true,
+                parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.data.total, //解析数据长度
+                        "data": res.data.data //解析数据列表
+                    };
+                },
+            });
+            
+            //监听表格复选框选择
+            table.on('checkbox(test-table-operate)', function(obj){
+                console.log(obj);
+            });
+            //监听工具条
+            table.on('tool(test-table-operate)', function(obj){
+              var data = obj.data;
+              if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                  obj.del();
+                  layer.close(index);
+                });
+              } else if(obj.event === 'edit'){
+                  layer.alert("<label>账号</label>" +
+                      "<input type='text' class='form-control' value='"+data.username.replace(/^\s+|\s+$/g,"")+"' />"+
+                      "<label>登入时间</label>" +
+                      "<input type='text' class='form-control' value='"+data.logintime.replace(/^\s+|\s+$/g,"")+"' />"+
+                      "<label>登入IP</label>" +
+                      "<input type='text' class='form-control' value='"+data.loginIP.replace(/^\s+|\s+$/g,"")+"' />",{
+                      btn: ['确定','取消'],
+                      yes:function(){
+                      }
+                  });
+              }
+            });
+            
+            $('.test-table-operate-btn .layui-btn').on('click', function(){
+              var type = $(this).data('type');
+              active[type] ? active[type].call(this) : '';
+            });
+
+          });
+
+          </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+<ul class="breadcrumb">
+    <li>系统基础管理</li>
+    <li class="active">角色管理</li>
+</ul>
+<div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+</div>
+<table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate" ></table>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    添加角色
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label for="name">角色</label>
+                        <input type="text" class="form-control" placeholder="输入角色">
+                        <label for="name">权限</label>
+                        <input type="text" class="form-control" placeholder="输入权限">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-primary">
+                    添加
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="test-table-operate-barDemo">
+</script>
+<script src="../layuiadmin/layui/layui.js"></script>
+<script>
+    let list=new Array();
+    layui.config({
+        base: '../layuiadmin/' //静态资源所在路径
+    }).extend({
+        index: '/lib/index' //主入口模块
+    }).use(['index', 'table'], function(){
+        var table = layui.table
+            ,admin = layui.admin;
+
+        table.render({
+            elem: '#test-table-operate'
+            ,url: "/MS/getrolo"
+            ,cols: [[
+                {type:'checkbox', fixed: 'left'}
+                ,{field:'id', width:250, title: 'ID', sort: true, fixed: 'left'}
+                ,{field:'rolo', width:250, title: '角色'}
+                ,{field:'power', width:300, title: '权限', sort: true}
+                ,{width:280, align:'center', fixed: 'right', toolbar: '#test-table-operate-barDemo'}
+            ]]
+            ,page: false
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(test-table-operate)', function(obj){
+            console.log(obj);
+        });
+        //监听工具条
+        table.on('tool(test-table-operate)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    obj.del();
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.alert("<label>ID</label>" +
+                    "<input type='text' class='form-control' value='"+data.id+"' />"+
+                    "<label>角色</label>" +
+                    "<input type='text' class='form-control' value='"+data.rolo+"' />"+
+                    "<label>权限</label>" +
+                    "<input type='text' class='form-control' value='"+data.power+"' />",{
+                    btn: ['确定','取消'],
+                    yes:function(){
+                        layer.msg('按钮1')
+                    }
+                });
+            }
+        });
+
+        $('.test-table-operate-btn .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+</body>
+</html>

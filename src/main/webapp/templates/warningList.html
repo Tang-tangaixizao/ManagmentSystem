@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+  <link rel="stylesheet" href="../static/bootstrap.min.css">  
+  <script src="../static/jquery.min.js"></script>
+  <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>系统监控管理</li>
+        <li class="active">警告列表</li>
+      </ul>
+    <table class="layui-hide" id="test-table-simple"></table>
+    <script src="../layuiadmin/layui/layui.js"></script>  
+    <script>
+        layui.config({
+            base: '../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'table'], function(){
+            var table = layui.table;
+
+            table.render({
+                elem: '#test-table-simple'
+                ,url:"/MS/getwarninglist"
+                ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                ,cols: [[
+                    {field:'id', width:80, title: 'ID', sort: true}
+                    ,{field:'time', width:300, title: '时间'}
+                    ,{field:'type', width:300, title: '类型', sort: true}
+                    ,{field:'explain', width:450, title: '说明'}
+                ]]
+            });
+        });
+    </script>
+</body>
+</html>

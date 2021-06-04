@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台权限管理系统登录页</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">  
+    <link rel="stylesheet" href="./css/type.css"/>
+	<script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/login.js"></script>
+</head>
+<body>
+    <div id="tipl" class="alert alert-danger alert-dismissable" style="display: none;">
+        <button type="button" style="background-color: #f8d7da;
+        border: none;font-weight: bold;" class="close" data-dismiss="alert"
+                aria-hidden="true">
+            &times;
+        </button>
+        用户名或密码错误!!!
+    </div>
+    <div class="box_login">
+        
+            <div class="row">
+            <center>
+                <img src="./img/社区.svg" class="img-responsive" alt="加载图片失败">
+            </center>
+            <div class="form-group">
+                <div class="col-sm-10 col-10 m-auto">
+                    <input type="text" class="form-control" id="username" name="username"
+                           placeholder="请输入账号">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10 col-10 m-auto">
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="请输入密码">
+                </div>
+            </div>
+            
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10 col-10 m-auto">
+                    <div class="checkbox" style="margin-top: 10px;">
+                        <label>
+                            <input id="rememberme"
+                                   type="checkbox"
+                                   name="rememberme"
+                                   onclick="remember();"> 请记住我
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <div class="col-sm-offset-2 col-sm-10 col-10 m-auto">
+                    <button name="loginbtn" class="btn col-sm-12 col-12 btn-grad">登录</button>
+                </div>
+            </div>
+            </div>
+    </div>
+</body>
+
+</html>

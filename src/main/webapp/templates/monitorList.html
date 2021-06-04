@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../static/js/jquery.min.js"></script>
+    <!-- 引入 echarts.js -->
+    <script src="../js/echarts.min.js"></script>
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">  
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>系统监控管理</li>
+        <li class="active">实时监控</li>
+      </ul>
+     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+     <div id="main" style="width: 600px;height:400px;display: inline-block;"></div>
+      <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+      <div id="zxt" style="height: 400px; width: 400PX;display: inline-block;"></div>
+      <div id="disk" style="width: 520px;height:400px;display: inline-block;"></div>
+      <div id="chart1" style="width:600px; height: 400px;display: inline-block;"></div>
+      <script src="../js/myCharts.js"></script>
+      <script>
+		option = {
+            title:{
+                text:"CPU利用率(%)"
+            },
+		    xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		    },
+		    yAxis: {
+		        boundaryGap: [0, '0.1%'],
+		        type: 'value'
+		    },
+            tooltip:{trigger: 'axis'},
+            color:"#0097e6",
+		    series: [
+		        {
+		            name:'CPU利用率',
+		            type:'line',
+		            smooth:true,
+		            symbol: 'none',
+		            stack: 'a',
+		            areaStyle: {
+		                normal: {}
+		            },
+		            data: [100,20,30,50,40,60]
+		        }
+		    ]
+		};
+          /**保存时间
+           * */
+        var time=[];
+        /**保存利用率
+         * */
+        var data=[];
+		setInterval(function () {
+		    $.ajax({
+                type : "post",
+                async : true, //异步请求
+                url : "/MS/getCPUinfo",
+                data : {},
+                dataType : "json",
+                success : function(result) {
+                    time.push(result.time);
+                    data.push(result.data);
+                    if (result.status) {
+                        myChart2.hideLoading();    //隐藏加载动画
+                        myChart2.setOption({        //加载数据图表
+                            xAxis: {
+                                data: time
+                            },
+                            yAxis:{},//注意一定不能丢了这个，不然图表Y轴不显示
+                            series: [{
+                                name:'CPU利用率',
+                                type:'line',
+                                smooth:true,
+                                symbol: 'none',
+                                stack: 'a',
+                                areaStyle: {
+                                    normal: {}
+                                },
+                                data: data
+                            }]
+                        });
+
+                    }
+
+                },
+                error : function(errorMsg) {
+                    //请求失败时执行该函数
+                    layer.alert("图表请求数据失败!");
+                    myChart2.hideLoading();
+                }
+            });
+		}, 400);
+		setTimeout(function(){
+            setInterval(function(){
+                time.shift();
+                data.shift();
+            },400);
+        },6000);
+        // 基于准备好的dom，初始化echarts实例
+        var myChart2 = echarts.init(document.getElementById('main'));
+        myChart2.setOption(option)
+      </script>
+
+<script type="text/javascript">
+    //初始化echarts实例
+    var myChart1 = echarts.init(document.getElementById('chart1'));
+    let netName=[];
+    let netData;
+    let netDataLine=[];
+        $.ajax({
+            type : "post",
+            async : true, //异步请求
+            url : "/MS/getnetinfo",
+            data : {},
+            dataType : "json",
+            success : function(result) {
+                for (var i=0;i<Object.getOwnPropertyNames(result).length;i++){
+                    netName.push(result["data"+i].name);
+                    netData=new Array();
+                    for(var j=0;j<result["data"+i].list.length;j++){
+                        netData.push(result["data"+i].list[j]);
+                    }
+                    netDataLine.push(netData);
+                }
+                console.log(netDataLine)
+                myChart1.hideLoading();    //隐藏加载动画
+                myChart1.setOption({
+                    title:{
+                        text:'网卡接收和发送情况(byte)'
+                    },
+                    tooltip:{trigger: 'axis'},
+                    xAxis:{
+                        boundaryGap: false,
+                        data:netName,
+                    },
+                    yAxis:{
+                    },
+                    series:[{
+                        name:'接收到的总字节数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#eb4d4b"}
+                        },lineSyle:{
+                            normal: {color:"#eb4d4b"}
+                        },
+                        data:[netDataLine[0][0],netDataLine[1][0],netDataLine[2][0],netDataLine[3][0],netDataLine[4][0],netDataLine[5][0],netDataLine[6][0],netDataLine[7][0]]
+                    },{
+                        name:'发送的总字节数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#f0932b"}
+                        },lineSyle:{
+                            normal: {color:"#f0932b"}
+                        },
+                        data:[netDataLine[0][1],netDataLine[1][1],netDataLine[2][1],netDataLine[3][1],netDataLine[4][1],netDataLine[5][1],netDataLine[6][1],netDataLine[7][1]]
+                    },{
+                        name:'接收到的错误包数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#6ab04c"}
+                        },lineSyle:{
+                            normal: {color:"#6ab04c"}
+                        },
+                        data:[netDataLine[0][2],netDataLine[1][2],netDataLine[2][2],netDataLine[3][2],netDataLine[4][2],netDataLine[5][2],netDataLine[6][2],netDataLine[7][2]]
+                    },{
+                        name:'发送数据包时的错误数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#e84393"}
+                        },lineSyle:{
+                            normal: {color:"#e84393"}
+                        },
+                        data:[netDataLine[0][3],netDataLine[1][3],netDataLine[2][3],netDataLine[3][3],netDataLine[4][3],netDataLine[5][3],netDataLine[6][3],netDataLine[7][3]]
+                    },{
+                        name:'接收时丢弃的包数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#00cec9"}
+                        },lineSyle:{
+                            normal: {color:"#00cec9"}
+                        },
+                        data:[netDataLine[0][4],,netDataLine[1][4],netDataLine[2][4],netDataLine[3][4],netDataLine[4][4],netDataLine[5][4],netDataLine[6][4],netDataLine[7][4]]
+                    },{
+                        name:'发送时丢弃的包数',
+                        type:'line',
+                        areaStyle: {
+                            normal: {color:"#2c3e50"}
+                        },lineSyle:{
+                            normal: {color:"#2c3e50"}
+                        },
+                        data:[netDataLine[0][5],netDataLine[1][5],netDataLine[2][5],netDataLine[3][5],netDataLine[4][5],netDataLine[5][5],netDataLine[6][5],netDataLine[7][5]]
+                    }]
+                });
+            },
+            error : function(errorMsg) {
+                //请求失败时执行该函数
+                layer.alert("图表请求数据失败!");
+                myChart.hideLoading();
+            }
+        });
+</script>
+</body>
+</html>

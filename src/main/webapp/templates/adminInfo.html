@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+	<script src="../static/jquery.min.js"></script>
+	<script src="../static/bootstrap.min.js"></script>
+    <script src="../js/adminInfo.js"></script>
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../layuiadmin/layui/css/layui.css">
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>管理员信息</li>
+    </ul>
+    <form role="form" style="width: 45%;margin-left: 8%;" enctype="multipart/form-data">
+
+                <label for="name">头像</label><br/>
+                <img id="userImage" style="width: 140px;height: 140px;
+                border-radius: 10px;"
+                 src="../img/p-250.png"
+                  class="img-rounded">
+                <br/>
+                <input type="file" id="inputfile">
+
+                <label for="name">账号</label>
+                <input type="text" class="form-control" name="username" placeholder="账号信息">
+                <label for="name">姓名</label>
+                <input type="text" class="form-control" name="name" placeholder="姓名信息">
+                <label for="name">电话号码</label>
+                <input type="text" class="form-control" name="iphone" placeholder="电话号码信息">
+                <label for="name">年龄</label>
+                <input type="text" class="form-control" name="age" placeholder="年龄信息">
+                <label for="name">性别</label>
+                <div>
+                    <label class="radio-inline">
+                        <input type="radio" name="optionsRadiosinline" id="boy" value="男" checked>男
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="optionsRadiosinline" id="girl"  value="女"> 女
+                    </label>
+                </div>
+            <div>
+                <label for="name" >
+                    角色
+                </label>
+                    <input name="rolo" class="form-control" id="disabledInput" type="text" placeholder="角色信息" disabled>
+            </div>
+        </form>
+        <div style="margin-top: 20px;margin-left: 8%;">
+            <button id="reset" type="button" class="btn btn-default">重置</button>
+            <button id="confirmChange" type="button" class="btn btn-primary">确定修改</button>
+        </div>
+    <script src="../layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: '/lib/index' //主入口模块
+        }).use(['index', 'table'], function(){
+            document
+                .getElementById("inputfile")
+                .addEventListener("change", handleFileChange, false);
+            function handleFileChange(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    if (reader.readyState == 2) {
+                        let isImage=reader.result;
+                        console.log(reader.result);
+                        let pattern =new RegExp("^data:image/.*")
+                        if(pattern.test(reader.result)){
+                            document.getElementById("userImage").setAttribute("src",reader.result);
+                        }else{
+                            document.getElementById("userImage")
+                                .setAttribute("src","../img/p-250.png");
+                            document.getElementsByTagName('input')[0].value="";
+                            layer.msg("请选择图片!!");
+                        }
+                    }
+                };
+            }
+
+            $(function(){
+                /**确定修改按钮
+                 * */
+                $("#confirmChange").click(function(){
+                    $.ajax({
+                        url:"/MS/changemyinfo",
+                        data:{id:getQueryVariable("data"),
+                            faceicon:$("#userImage").attr("src"),
+                            username:$("input[name=username]").val(),
+                            name:$("input[name=name]").val(),
+                            iphone:$("input[name=iphone]").val(),
+                            age:$("input[name=age]").val(),
+                            sex:$("input[type=radio]").val(),
+                            rolo:$("input[name=rolo]").val()},
+                        success:function(response){
+                            if(response!=0){
+                                layer.msg("修改成功");
+                            }else{
+                                layer.msg("修改失败，请重新尝试");
+                            }
+                            setTimeout(function(){
+                                window.top.location.reload();
+                            },1000);
+                        }
+                    });
+                });
+            });
+
+            function getQueryVariable(variable) {
+                let query = window.top.location.search.substring(1);
+                let vars = query.split("&");
+                for (var i=0;i<vars.length;i++) {
+                    let pair = vars[i].split("=");
+                    if(pair[0] == variable){return pair[1];}
+                }
+                return(false);
+            }
+        });
+          </script>
+</body>
+</html>

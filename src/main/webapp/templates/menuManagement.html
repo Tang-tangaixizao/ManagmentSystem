@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../treeTable/layui/css/layui.css">
+    <link rel="stylesheet" href="../treeTable/css/demo.css">
+    <link rel="stylesheet" href="../static/fourm/css/demo1.css">
+    <link rel="stylesheet" href="../static/bootstrap.min.css">  
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/bootstrap.min.js"></script>
+</head>
+<body>
+    <ul class="breadcrumb">
+        <li>系统基础管理</li>
+        <li class="active">菜单管理</li>
+      </ul>
+    <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+        <button id="useradd" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+            添加菜单
+        </button>
+    </div>
+    <table id="demoTreeTb" ></table>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        添加菜单
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="name">一级菜单</label>
+                            <select id="one" class="form-control selector">
+                                <option>系统基础管理</option>
+                                <option>系统监控管理</option>
+                                <option>系统操作管理</option>
+                            </select>
+                            <label for="name">二级菜单</label>
+                            <select id="two" class="form-control selector">
+                               <option>用户管理</option>
+                               <option>角色管理</option>
+                            </select>
+                            <label for="name">菜单名称</label>
+                            <input name="menuname" type="text" class="form-control" placeholder="输入菜单名称">
+                            <label for="name">菜单地址</label>
+                            <input name="menuaddr" type="text" class="form-control" placeholder="输入菜单地址">
+                            <label for="name">权限标识</label>
+                            <input name="powerindex" type="text" class="form-control" placeholder="输入权限标识">
+                            <label for="name">类型</label>
+                            <select id="type" class="form-control selector">
+                                <option>菜单</option>
+                                <option>按钮</option>
+                            </select>
+                            <label for="name">是否隐藏</label>
+                            <select id="isHide" class="form-control selector">
+                                <option>否</option>
+                                <option>是</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary addmenubtn">
+                        添加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- 表格操作列 -->
+<script type="text/html" id="tbBar">
+    <a class="menuedit layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="menudel layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="../treeTable/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '../treeTable/'
+    }).use(['treeTable'], function () {
+        var treeTable = layui.treeTable;
+
+        // 渲染表格
+        treeTable.render({
+            elem: '#demoTreeTb',
+            url: '/MS/getmenuinfo',
+            toolbar: true,
+            tree: {
+                iconIndex: 2,
+                isPidData: true,
+                idName: 'authorityId',
+                pidName: 'parentId',
+                arrowType: 'arrow2',
+                getIcon: 'ew-tree-icon-style2'
+            },
+            cols: [[
+                {type: 'numbers'},
+                {type: 'checkbox'},
+                {field: 'authorityName', title: '菜单名称', minWidth: 135},
+                {field: 'menuUrl', title: '菜单地址',width: 200},
+                {field: 'authority', title: '权限标识'},
+                {title: '类型', templet: '<p>{{d.isMenu?"菜单":"按钮"}}</p>', align: 'center', width: 60},
+                {field: 'createTime', title: '创建时间',width: 160},
+                {field: 'isHide', title: '是否隐藏',width:10},
+                {align: 'center', toolbar: '#tbBar', title: '操作', width: 130}
+            ]],
+        });
+
+        //监听工具条
+        treeTable.on('tool(demoTreeTb)', function(obj){
+            let data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        url:"/MS/delmenubyid",
+                        data:{id:data.authorityId},
+                        success:function(response){
+                            if(response!=0){
+                                layer.msg("删除成功");
+                            }else{
+                                layer.msg("删除失败，请重新尝试");
+                            }
+                            location.reload();
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                let ismenu=data.isMenu==1?"菜单":"按钮";
+                layer.alert("<label>菜单名称</label>" +
+                    "<input id='menuName' type='text' class='form-control' value='"+data.authorityName+"' />"+
+                    "<label>菜单地址</label>" +
+                    "<input id='menuUrl' type='text' class='form-control' value='"+data.menuUrl+"' />"+
+                    "<label>权限标识</label>" +
+                    "<input id='power' type='text' class='form-control' value='"+data.authority+"' />"+
+                    "<label>类型</label>" +
+                    "<input id='type' type='text' class='form-control' value='"+ismenu+"' />" +
+                    "<label>创建时间</label>" +
+                    "<input id='time' type='text' class='form-control' value='"+data.createTime+"' />"+
+                    "<label>是否隐藏</label>" +
+                    "<input id='isHide' type='text' class='form-control' value='"+data.isHide+"' />",{
+                    btn: ['确定','取消'],
+                    yes:function(){
+                        $.ajax({
+                            url:"/MS/menuedit",
+                            data:{id:data.authorityId,
+                            menuName:$("#menuName").val(),
+                            menuUrl:$("#menuUrl").val(),
+                            power:$("#power").val(),
+                            type:$("#type").val(),
+                            time:$("#time").val(),
+                            isHide:$("#isHide").val()},
+                            success:function(response){
+                                if(response!=0){
+                                    layer.msg("更新成功");
+                                }else{
+                                    layer.msg("更新失败，请重新尝试");
+                                }
+                                setTimeout(function(){
+                                    location.reload();
+                                },1000);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    $(function(){
+       $("#one").change(function(){
+           let selectElement=$("#two");
+           switch ($("#one > option:selected").text()) {
+               case "系统基础管理":{
+                   selectElement.get(0).options.length=0;
+                   selectElement.append("<option>用户管理</option>");
+                   selectElement.append("<option>角色管理</option>");
+               };break;
+               case "系统监控管理":{
+                   selectElement.get(0).options.length=0;
+                   selectElement.append("<option>警告列表</option>");
+                   selectElement.append("<option>实时监控</option>");
+               };break;
+               case "系统操作管理":{
+                   selectElement.get(0).options.length=0;
+                   selectElement.append("<option>登录信息管理</option>");
+                   selectElement.append("<option>操作日志管理</option>");
+               };break;
+           }
+       });
+
+       $(".addmenubtn").click(function(){
+           $.ajax({
+               url:"/MS/addmenuinfo",
+               data:{
+                   oneName:$("#one > option:selected").text(),
+                   twoName:$("#two > option:selected").text(),
+                   menuName:$("input[name=menuname]").val(),
+                   menuUrl:$("input[name=menuaddr]").val(),
+                   authority:$("input[name=powerindex]").val(),
+                   isMenu:$("#type > option:selected").text(),
+                   isHide:$("#isHide > option:selected").text(),
+               },
+               success:function(response){
+                   if (response!=0){
+                       layer.msg("修改成功");
+                       setTimeout(function(){
+                           location.reload();
+                       },900);
+                   }else{
+                       layer.msg("未修改成功，请重新尝试!");
+                   }
+               }
+           });
+       });
+    });
+</script>
+    <script src="../js/menu.js"></script>
+  </body>
+</html>
